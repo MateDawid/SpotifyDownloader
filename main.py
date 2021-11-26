@@ -1,8 +1,8 @@
-from FileChecker import FileChecker
+from downloaded_playlist import DownloadedPlaylist
 
 
 if __name__ == '__main__':
-    file_checker = FileChecker()
-    file_checker.set_directory('E:\[MUZYKA]\WSZYSTKIE')
-    file_checker.get_downloaded_playlist()
-    file_checker.print_downloaded_playlist()
+    downloaded_playlist = DownloadedPlaylist()
+    downloaded_playlist.set_directory('E:\[MUZYKA]\WSZYSTKIE')
+    downloaded_playlist.get_playlist()
+    downloaded_playlist.print_playlist()
