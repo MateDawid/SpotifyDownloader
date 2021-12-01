@@ -2,10 +2,11 @@ import os
 
 
 class PlaylistComparator:
-    def __init__(self, download_directory, spotify_playlist):
+    def __init__(self, download_directory, spotify_client):
         self.download_directory = download_directory
+        self.spotify_client = spotify_client
         self.downloaded_playlist = self.download_directory.downloaded_playlist
-        self.spotify_playlist = spotify_playlist.playlist
+        self.spotify_playlist = spotify_client.spotify_playlist
         self.forbidden_signs = {'<', '>', ':', '"', '/', '\\', '|', '?', '*'}
         self.spotify_song_titles = [song[0] for song in self.spotify_playlist]
         self.spotify_song_ids = [song[1] for song in self.spotify_playlist]
@@ -54,8 +55,6 @@ class PlaylistComparator:
                 else:
                     new_title = new_title.replace(forbidden_sign, '-')
         return new_title
-
-
 
     def get_not_liked_songs(self):
         for song in self.downloaded_playlist:

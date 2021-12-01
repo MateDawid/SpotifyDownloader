@@ -43,7 +43,7 @@ class DownloadDirectory:
                     else:
                         others.append(f'{self.directory_path}\\{song}.mp3')
             if others:
-                print("UNFORMATTED DOWNLOADED SONGS:")
+                print("NOT FORMATTED DOWNLOADED SONGS:")
                 for idx, song in enumerate(others, start=1):
                     print(f'{idx}. {song}')
         else:

@@ -3,13 +3,13 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 
-class SpotifyPlaylist:
+class SpotifyClient:
     def __init__(self, client_id=None, client_secret=None, redirect_uri='http://localhost:8000'):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.user = None
-        self.playlist = None
+        self.spotify_playlist = None
         self.connect_with_spotify_user()
         self.get_playlist()
 
@@ -40,13 +40,13 @@ class SpotifyPlaylist:
 
     def get_playlist(self):
         tracks = self.get_favourite_songs()
-        self.playlist = [(f"{item['track']['artists'][0]['name']} - "
-                          f"{item['track']['name']}", self.get_song_url(item)) for item in tracks]
+        self.spotify_playlist = [(f"{item['track']['artists'][0]['name']} - "
+                                  f"{item['track']['name']}", self.get_song_url(item)) for item in tracks]
 
     def print_playlist(self):
-        if self.playlist:
-            count = len(self.playlist)
-            for idx, song_tuple in enumerate(self.playlist, start=1):
+        if self.spotify_playlist:
+            count = len(self.spotify_playlist)
+            for idx, song_tuple in enumerate(self.spotify_playlist, start=1):
                 print(f"({idx}/{count}) {song_tuple[0]}")
         else:
             print(f"No songs found in playlist!")
