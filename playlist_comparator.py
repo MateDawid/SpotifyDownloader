@@ -2,8 +2,9 @@ import os
 
 
 class PlaylistComparator:
-    def __init__(self, downloaded_playlist, spotify_playlist):
-        self.downloaded_playlist = downloaded_playlist.downloaded_playlist
+    def __init__(self, download_directory, spotify_playlist):
+        self.download_directory = download_directory
+        self.downloaded_playlist = self.download_directory.downloaded_playlist
         self.spotify_playlist = spotify_playlist.playlist
         self.forbidden_signs = {'<', '>', ':', '"', '/', '\\', '|', '?', '*'}
         self.spotify_song_titles = [song[0] for song in self.spotify_playlist]
@@ -60,15 +61,16 @@ class PlaylistComparator:
         for song in self.downloaded_playlist:
             if song not in self.spotify_song_titles:
                 if song.lower() in self.spotify_title_mapping:
-                    old_title = f'{self.downloaded_playlist.directory}\\{song}.mp3'
-                    new_title = f'{self.downloaded_playlist.directory}\\{self.spotify_title_mapping[song.lower()]}.mp3'
+                    old_title = f'{self.download_directory.directory_path}\\{song}.mp3'
+                    new_title = f'{self.download_directory.directory_path}\\' \
+                                f'{self.spotify_title_mapping[song.lower()]}.mp3'
                     os.rename(old_title, new_title)
                 else:
                     self.not_liked_songs.append(song)
 
     def print_not_liked_songs(self):
         if self.not_liked_songs:
-            print(f"NOT LIKED SONGS FROM DIRECTORY:")
+            print(f"NOT LIKED SONGS FROM DIRECTORY {self.download_directory.directory_path}:")
             for idx, song in enumerate(self.not_liked_songs, start=1):
                 print(f'{idx}. {song}')
         else:
