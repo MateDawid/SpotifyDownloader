@@ -7,9 +7,6 @@ class SpotifySong:
         self.track_number = self.set_track_number()
         self.url = self.set_url()
 
-    def __repr__(self):
-        return f'{", ".join(self.artists)} - {self.name}'
-
     def set_name(self):
         return self.track_data['name']
 
@@ -24,3 +21,14 @@ class SpotifySong:
 
     def set_url(self):
         return self.track_data['external_urls']['spotify']
+
+
+class DownloadedSong:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def set_name(self):
+
+    def set_artists(self):
+        pass
+    
