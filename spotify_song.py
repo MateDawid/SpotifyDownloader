@@ -20,7 +20,7 @@ class SpotifySong:
         return self.track_data['album']['release_date'].strip()
 
     def set_track_number(self):
-        return self.track_data['track_number'].strip()
+        return self.track_data['track_number']
 
     def set_url(self):
         return self.track_data['external_urls']['spotify'].strip()
