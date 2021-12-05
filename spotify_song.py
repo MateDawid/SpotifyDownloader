@@ -11,16 +11,16 @@ class SpotifySong:
         return f'{", ".join(self.artists)} - {self.name}'
 
     def set_name(self):
-        return self.track_data['name']
+        return self.track_data['name'].strip()
 
     def set_artists(self):
-        return [artist['name'] for artist in self.track_data['artists']]
+        return [artist['name'].strip() for artist in self.track_data['artists']]
 
     def set_release_date(self):
-        return self.track_data['album']['release_date']
+        return self.track_data['album']['release_date'].strip()
 
     def set_track_number(self):
-        return self.track_data['track_number']
+        return self.track_data['track_number'].strip()
 
     def set_url(self):
-        return self.track_data['external_urls']['spotify']
+        return self.track_data['external_urls']['spotify'].strip()
