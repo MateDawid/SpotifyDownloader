@@ -1,26 +1,30 @@
 class SpotifySong:
     def __init__(self, track_data):
-        self.track_data = track_data
-        self.name = self.set_name()
-        self.artists = self.set_artists()
-        self.release_date = self.set_release_date()
-        self.track_number = self.set_track_number()
-        self.url = self.set_url()
+        self.name = self.set_name(track_data)
+        self.artists = self.set_artists(track_data)
+        self.release_date = self.set_release_date(track_data)
+        self.track_number = self.set_track_number(track_data)
+        self.url = self.set_url(track_data)
 
     def __repr__(self):
         return f'{", ".join(self.artists)} - {self.name}'
 
-    def set_name(self):
-        return self.track_data['name'].strip()
+    @staticmethod
+    def set_name(track_data):
+        return track_data['name'].strip()
 
-    def set_artists(self):
-        return [artist['name'].strip() for artist in self.track_data['artists']]
+    @staticmethod
+    def set_artists(track_data):
+        return [artist['name'].strip() for artist in track_data['artists']]
 
-    def set_release_date(self):
-        return self.track_data['album']['release_date'].strip()
+    @staticmethod
+    def set_release_date(track_data):
+        return track_data['album']['release_date'].strip()
 
-    def set_track_number(self):
-        return self.track_data['track_number']
+    @staticmethod
+    def set_track_number(track_data):
+        return track_data['track_number']
 
-    def set_url(self):
-        return self.track_data['external_urls']['spotify'].strip()
+    @staticmethod
+    def set_url(track_data):
+        return track_data['external_urls']['spotify'].strip()
