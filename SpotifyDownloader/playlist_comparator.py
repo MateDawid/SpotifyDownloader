@@ -11,7 +11,6 @@ class PlaylistComparator:
         self.not_liked_songs = self.get_not_liked_songs()
         self.not_downloaded_songs = self.get_not_downloaded_songs()
 
-
     def generate_formatted_downloaded_playlist(self):
         return [str(downloaded_song).lower() for downloaded_song in self.downloaded_playlist]
 
