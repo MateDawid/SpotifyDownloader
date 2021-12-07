@@ -19,10 +19,10 @@ class SpotifyClient:
         self.redirect_uri = redirect_uri
 
     def save_credentials(self, client_id, client_secret):
-        if os.path.isfile('.env'):
-            with open('.env', 'r+') as env_file:
+        if os.path.isfile('../.env'):
+            with open('../.env', 'r+') as env_file:
                 env_file.truncate(0)
-        with open('.env', 'w') as env_file:
+        with open('../.env', 'w') as env_file:
             env_file.write(f"CLIENT_ID={client_id}\n")
             env_file.write(f"CLIENT_SECRET={client_secret}")
         self.connect_with_spotify_user()
@@ -30,8 +30,8 @@ class SpotifyClient:
     @staticmethod
     def get_credentials():
         credentials = {}
-        if os.path.isfile('.env'):
-            with open('.env') as env_file:
+        if os.path.isfile('../.env'):
+            with open('../.env') as env_file:
                 for line in env_file:
                     key, value = line.strip().split('=', 1)
                     credentials[key.strip()] = value.strip()
