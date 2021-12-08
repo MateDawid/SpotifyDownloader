@@ -1,5 +1,8 @@
 from math import ceil
 import os
+import time
+from datetime import datetime
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, SpotifyOauthError
 
@@ -50,7 +53,7 @@ class SpotifyClient:
             try:
                 self.get_favourite_playlist()
             except SpotifyOauthError:
-                print("Wrong SpotifyAPI credentials proviced!")
+                print("Wrong SpotifyAPI credentials provided!")
 
     def get_songs_sublist(self, offset=0, limit=50):
         return self.user.current_user_saved_tracks(limit=limit, offset=offset)
@@ -72,3 +75,40 @@ class SpotifyClient:
                 print(f"({idx}/{count}) {song}")
         else:
             print(f"No songs in Spotify favourite playlist!")
+
+    @staticmethod
+    def get_song_age_in_days(song):
+        try:
+            return (datetime.today() - datetime.strptime(song.release_date, "%Y-%m-%d")).days
+        except ValueError:
+            return (datetime.today() - datetime.strptime(song.release_date, "%Y")).days
+
+    def get_sorted_playlist(self, playlist, sort_method,  reverse):
+        if sort_method == 'artist-release_date-track_number':
+            sort_key = lambda song: (song.artists[0].lower(), song.release_date, song.track_number)
+        elif sort_method == 'artist-song_age':
+            sort_key = lambda song: (song.artists[0].lower(), self.get_song_age_in_days(song))
+        elif sort_method == 'artist-song_name':
+            sort_key = lambda song: (song.artists[0].lower(), song.name.lower())
+        elif sort_method == 'song_name':
+            sort_key = lambda song: song.name.lower()
+        elif sort_method == 'release_date':
+            sort_key = lambda song: song.release_date
+        if sort_key:
+            return sorted(playlist, key=sort_key, reverse=reverse)
+
+    def sort_favourite_playlist(self, sort_method, reverse=True):
+        sorted_playlist = self.get_sorted_playlist(self.favourite_playlist, sort_method, reverse)
+        sorted_playlist_names = [str(song) for song in reversed(sorted_playlist)]
+        unsorted_playlist_names = [str(song) for song in self.favourite_playlist]
+        list_count = len(self.favourite_playlist)
+        if sorted_playlist_names != unsorted_playlist_names:
+            for idx, disordered_song in enumerate(self.favourite_playlist, start=1):
+                print(f'({idx}/{2*list_count}) DELETE => {disordered_song}')
+                self.user.current_user_saved_tracks_delete([disordered_song.url])
+            for idx, song_in_order in enumerate(sorted_playlist, start=1):
+                print(f'({idx+list_count}/{2 * list_count}) ADD => {song_in_order}')
+                self.user.current_user_saved_tracks_add([song_in_order.url])
+                time.sleep(1)
+        else:
+            print("Favourite playlist already sorted with selected method.")
