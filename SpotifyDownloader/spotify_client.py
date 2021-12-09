@@ -97,12 +97,34 @@ class SpotifyClient:
         if sort_key:
             return sorted(playlist, key=sort_key, reverse=reverse)
 
-    def sort_favourite_playlist(self, sort_method, reverse=True):
-        sorted_playlist = self.get_sorted_playlist(self.favourite_playlist, sort_method, reverse)
-        sorted_playlist_names = [str(song) for song in reversed(sorted_playlist)]
+    def create_favourite_playlist_backup_file(self):
+        with open('Backups/favourite_backup.txt', 'w') as backup_file:
+            for song in self.favourite_playlist:
+                backup_file.write(f'{song.url}\n')
+
+    def restore_favourite_playlist_from_backup(self):
+        backup_urls = []
+        with open('Backups/favourite_backup.txt', 'r') as backup_file:
+            for line in backup_file:
+                backup_urls.insert(0, line.replace('\n', ''))
+        favourite_playlist_urls = [song.url for song in reversed(self.favourite_playlist)]
+        if favourite_playlist_urls != backup_urls:
+            for backup_url in backup_urls:
+                if backup_url not in favourite_playlist_urls:
+                    self.user.current_user_saved_tracks_add([backup_url])
+        os.remove("Backups/favourite_backup.txt")
+
+    def sort_favourite_playlist(self, sort_method, reverse=False):
         unsorted_playlist_names = [str(song) for song in self.favourite_playlist]
+        if os.path.isfile('Backups/favourite_backup.txt'):
+            print('Restoring favourite playlist from backup file')
+            self.restore_favourite_playlist_from_backup()
+            self.get_favourite_playlist()
+        sorted_playlist = self.get_sorted_playlist(self.favourite_playlist, sort_method, not reverse)
+        sorted_playlist_names = [str(song) for song in reversed(sorted_playlist)]
         list_count = len(self.favourite_playlist)
         if sorted_playlist_names != unsorted_playlist_names:
+            self.create_favourite_playlist_backup_file()
             for idx, disordered_song in enumerate(self.favourite_playlist, start=1):
                 print(f'({idx}/{2*list_count}) DELETE => {disordered_song}')
                 self.user.current_user_saved_tracks_delete([disordered_song.url])
