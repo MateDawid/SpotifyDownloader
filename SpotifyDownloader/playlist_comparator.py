@@ -22,7 +22,7 @@ class PlaylistComparator:
                 continue
             downloaded = False
             for downloaded_song in self.downloaded_playlist:
-                name_condition = self.replace_forbidden_file_signs(spotify_song.name) == downloaded_song.name
+                name_condition = self.replace_forbidden_file_signs(spotify_song.name).lower() == downloaded_song.name.lower()
                 artists_condition = any(artist in spotify_song.artists for artist in downloaded_song.artists)
                 if name_condition and artists_condition:
                     downloaded = True
@@ -88,7 +88,15 @@ class PlaylistComparator:
 
     def download_songs_from_list(self):
         if self.not_downloaded_songs:
-            for song in self.not_downloaded_songs:
-                os.system(f'spotdl {song.url}') # NOQA
+            for idx, song in enumerate(self.not_downloaded_songs, start=1):
+                print(f"Download {idx} from {len(self.not_downloaded_songs)} songs.")
+                os.system(f'spotdl {song.url}')  # NOQA
+                files = os.listdir(os.getcwd())
+                new_songs = filter(lambda x: (x.endswith('.mp3')), files)
+                for new_song in new_songs:
+                    os.replace(
+                        f"{os.getcwd()}\\{new_song}",
+                        f"{self.download_directory.directory_path}\\{self.replace_forbidden_file_signs(str(song))}.mp3"
+                    )
         else:
             print("NO SONGS TO DOWNLOAD.")
