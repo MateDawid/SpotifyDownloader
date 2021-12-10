@@ -10,42 +10,21 @@ from spotify_song import SpotifySong
 
 
 class SpotifyClient:
-    def __init__(self):
-        self.credentials = self.get_credentials()
+    def __init__(self, client_id, client_secret):
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.user = None
         self.redirect_uri = 'http://localhost:8000'
         self.favourite_playlist = []
-        if self.credentials:
-            self.connect_with_spotify_user()
 
     def set_redirect_uri(self, redirect_uri):
         self.redirect_uri = redirect_uri
 
-    def save_credentials(self, client_id, client_secret):
-        if os.path.isfile('../.env'):
-            with open('../.env', 'r+') as env_file:
-                env_file.truncate(0)
-        with open('../.env', 'w') as env_file:
-            env_file.write(f"CLIENT_ID={client_id}\n")
-            env_file.write(f"CLIENT_SECRET={client_secret}")
-        self.connect_with_spotify_user()
-
-    @staticmethod
-    def get_credentials():
-        credentials = {}
-        if os.path.isfile('../.env'):
-            with open('../.env') as env_file:
-                for line in env_file:
-                    key, value = line.strip().split('=', 1)
-                    credentials[key.strip()] = value.strip()
-        return credentials
-
     def connect_with_spotify_user(self):
-        credentials = self.get_credentials()
         if credentials:
             auth_manager = SpotifyOAuth(
-                client_id=credentials['CLIENT_ID'],
-                client_secret=credentials['CLIENT_SECRET'],
+                client_id=self.client_id,
+                client_secret=self.client_secret,
                 redirect_uri=self.redirect_uri,
                 scope="user-library-read user-library-modify"
             )
