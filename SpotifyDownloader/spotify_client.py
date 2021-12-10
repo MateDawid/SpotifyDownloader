@@ -102,19 +102,24 @@ class SpotifyClient:
             for song in self.favourite_playlist:
                 backup_file.write(f'{song.url}\n')
 
-    def restore_favourite_playlist_from_backup(self):
+    def restore_favourite_playlist_from_backup(self, time_out=0):
         backup_urls = []
         with open('Backups/favourite_backup.txt', 'r') as backup_file:
             for line in backup_file:
                 backup_urls.insert(0, line.replace('\n', ''))
         favourite_playlist_urls = [song.url for song in reversed(self.favourite_playlist)]
         if favourite_playlist_urls != backup_urls:
-            for backup_url in backup_urls:
-                if backup_url not in favourite_playlist_urls:
-                    self.user.current_user_saved_tracks_add([backup_url])
+            try:
+                for backup_url in backup_urls:
+                    if backup_url not in favourite_playlist_urls:
+                        self.user.current_user_saved_tracks_add([backup_url])
+                        time.sleep(time_out)
+            except spotipy.SpotifyException:
+                print("SpotifyAPI error occured - restarting process")
+                self.restore_favourite_playlist_from_backup(time_out+0.2)
         os.remove("Backups/favourite_backup.txt")
 
-    def sort_favourite_playlist(self, sort_method, reverse=False):
+    def sort_favourite_playlist(self, sort_method, reverse=False, time_out=0):
         unsorted_playlist_names = [str(song) for song in self.favourite_playlist]
         if os.path.isfile('Backups/favourite_backup.txt'):
             print('Restoring favourite playlist from backup file')
@@ -125,9 +130,14 @@ class SpotifyClient:
         list_count = len(self.favourite_playlist)
         if sorted_playlist_names != unsorted_playlist_names:
             self.create_favourite_playlist_backup_file()
-            for idx, disordered_song in enumerate(self.favourite_playlist, start=1):
-                print(f'({idx}/{2*list_count}) DELETE => {disordered_song}')
-                self.user.current_user_saved_tracks_delete([disordered_song.url])
+            try:
+                for idx, disordered_song in enumerate(self.favourite_playlist, start=1):
+                    print(f'({idx}/{2*list_count}) DELETE => {disordered_song}')
+                    self.user.current_user_saved_tracks_delete([disordered_song.url])
+                    time.sleep(time_out)
+            except spotipy.SpotifyException:
+                print("SpotifyAPI error occured - restarting process")
+                self.sort_favourite_playlist(sort_method, reverse, time_out + 0.2)
             for idx, song_in_order in enumerate(sorted_playlist, start=1):
                 print(f'({idx+list_count}/{2 * list_count}) ADD => {song_in_order}')
                 self.user.current_user_saved_tracks_add([song_in_order.url])
