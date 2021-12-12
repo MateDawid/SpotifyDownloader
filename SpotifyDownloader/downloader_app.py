@@ -82,16 +82,15 @@ class DownloaderApp:
 
     def execute_sorting_method(self, sort_method):
         if sort_method == '1':
-            self.spotify_client.sort_playlist(self.spotify_client.favourite_playlist,
-                                              'artist-release_date-track_number')
+            self.spotify_client.sort_favourite_playlist('artist-release_date-track_number')
         elif sort_method == '2':
-            self.spotify_client.sort_playlist(self.spotify_client.favourite_playlist, 'artist-song_age')
+            self.spotify_client.sort_favourite_playlist('artist-song_age')
         elif sort_method == '3':
-            self.spotify_client.sort_playlist(self.spotify_client.favourite_playlist, 'artist-song_name')
+            self.spotify_client.sort_favourite_playlist('artist-song_name')
         elif sort_method == '4':
-            self.spotify_client.sort_playlist(self.spotify_client.favourite_playlist, 'song_name')
+            self.spotify_client.sort_favourite_playlist('song_name')
         elif sort_method == '5':
-            self.spotify_client.sort_playlist(self.spotify_client.favourite_playlist, 'release_date')
+            self.spotify_client.sort_favourite_playlist('release_date')
         elif sort_method == '6':
             pass
 
@@ -122,6 +121,7 @@ class DownloaderApp:
             self.set_client_secret(input('Enter SpotifyAPI Client Secret:\n'))
         if 'DOWNLOAD_PATH' not in self.user_data:
             self.set_download_path(input('Enter full path to your download directory:\n'))
+        print("\nConnecting with Spotify account...")
         self.spotify_client = SpotifyClient(self.user_data['CLIENT_ID'], self.user_data['CLIENT_SECRET'])
         while self.active:
             self.download_directory = DownloadDirectory(self.user_data['DOWNLOAD_PATH'])

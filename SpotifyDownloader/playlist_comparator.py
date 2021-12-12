@@ -101,5 +101,6 @@ class PlaylistComparator:
                         f"{os.getcwd()}\\{new_song}",
                         f"{self.download_directory.directory_path}\\{self.replace_forbidden_file_signs(str(song))}.mp3"
                     )
+                print("Downloading finished.")
         else:
             print("\nAll songs already downloaded.")
