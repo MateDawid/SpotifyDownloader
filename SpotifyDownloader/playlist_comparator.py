@@ -22,7 +22,9 @@ class PlaylistComparator:
                 continue
             downloaded = False
             for downloaded_song in self.downloaded_playlist:
-                name_condition = self.replace_forbidden_file_signs(spotify_song.name).lower() == downloaded_song.name.lower()
+                name_condition = (
+                        self.replace_forbidden_file_signs(spotify_song.name).lower() == downloaded_song.name.lower()
+                )
                 artists_condition = any(artist in spotify_song.artists for artist in downloaded_song.artists)
                 if name_condition and artists_condition:
                     downloaded = True
@@ -34,11 +36,11 @@ class PlaylistComparator:
 
     def print_not_downloaded_songs(self):
         if self.not_downloaded_songs:
-            print("NOT DOWNLOADED SONGS FROM PLAYLIST:")
+            print("\nNOT DOWNLOADED SONGS FROM PLAYLIST:")
             for idx, song in enumerate(self.not_downloaded_songs, start=1):
                 print(f'{idx}. {song}')
         else:
-            print("ALL SONGS ALREADY DOWNLOADED.")
+            print("\nAll songs already downloaded.")
 
     def replace_forbidden_file_signs(self, song_title):
         """
@@ -80,14 +82,15 @@ class PlaylistComparator:
 
     def print_not_liked_songs(self):
         if self.not_liked_songs:
-            print(f"NOT LIKED SONGS FROM DIRECTORY {self.download_directory.directory_path}:")
+            print(f"\nNOT LIKED SONGS FROM DIRECTORY {self.download_directory.directory_path}:")
             for idx, song in enumerate(self.not_liked_songs, start=1):
                 print(f'{idx}. {song}')
         else:
-            print("ALL SONGS ALREADY LIKED.")
+            print("\nAll songs in favourite playlist already.")
 
     def download_songs_from_list(self):
         if self.not_downloaded_songs:
+            print("\nDOWNLOADING:")
             for idx, song in enumerate(self.not_downloaded_songs, start=1):
                 print(f"Download {idx} from {len(self.not_downloaded_songs)} songs.")
                 os.system(f'spotdl {song.url}')  # NOQA
@@ -99,4 +102,4 @@ class PlaylistComparator:
                         f"{self.download_directory.directory_path}\\{self.replace_forbidden_file_signs(str(song))}.mp3"
                     )
         else:
-            print("NO SONGS TO DOWNLOAD.")
+            print("\nAll songs already downloaded.")
