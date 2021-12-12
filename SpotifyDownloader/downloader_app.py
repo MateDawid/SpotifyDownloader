@@ -35,18 +35,18 @@ class DownloaderApp:
     @staticmethod
     def get_user_data():
         credentials = {}
-        if os.path.isfile(f'{os.getcwd()}/.env'):
-            with open(f'{os.getcwd()}/.env') as env_file:
+        if os.path.isfile(f'{os.getcwd()}/../.env'):
+            with open(f'{os.getcwd()}/../.env') as env_file:
                 for line in env_file:
                     key, value = line.strip().split('=', 1)
                     credentials[key.strip()] = value.strip()
         return credentials
 
     def save_user_data(self):
-        if os.path.isfile(f'{os.getcwd()}/.env'):
-            with open(f'{os.getcwd()}/.env', 'r+') as env_file:
+        if os.path.isfile(f'{os.getcwd()}/../.env'):
+            with open(f'{os.getcwd()}/../.env', 'r+') as env_file:
                 env_file.truncate(0)
-        with open(f'{os.getcwd()}/.env', 'w') as env_file:
+        with open(f'{os.getcwd()}/../.env', 'w') as env_file:
             for key in self.user_data:
                 env_file.write(f"{key}={self.user_data[key]}\n")
 
