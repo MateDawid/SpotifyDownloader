@@ -10,50 +10,26 @@ from spotify_song import SpotifySong
 
 
 class SpotifyClient:
-    def __init__(self):
-        self.credentials = self.get_credentials()
+    def __init__(self, client_id, client_secret):
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.user = None
         self.redirect_uri = 'http://localhost:8000'
         self.favourite_playlist = []
-        if self.credentials:
-            self.connect_with_spotify_user()
-
-    def set_redirect_uri(self, redirect_uri):
-        self.redirect_uri = redirect_uri
-
-    def save_credentials(self, client_id, client_secret):
-        if os.path.isfile('../.env'):
-            with open('../.env', 'r+') as env_file:
-                env_file.truncate(0)
-        with open('../.env', 'w') as env_file:
-            env_file.write(f"CLIENT_ID={client_id}\n")
-            env_file.write(f"CLIENT_SECRET={client_secret}")
         self.connect_with_spotify_user()
 
-    @staticmethod
-    def get_credentials():
-        credentials = {}
-        if os.path.isfile('../.env'):
-            with open('../.env') as env_file:
-                for line in env_file:
-                    key, value = line.strip().split('=', 1)
-                    credentials[key.strip()] = value.strip()
-        return credentials
-
     def connect_with_spotify_user(self):
-        credentials = self.get_credentials()
-        if credentials:
-            auth_manager = SpotifyOAuth(
-                client_id=credentials['CLIENT_ID'],
-                client_secret=credentials['CLIENT_SECRET'],
-                redirect_uri=self.redirect_uri,
-                scope="user-library-read user-library-modify"
-            )
-            self.user = spotipy.Spotify(auth_manager=auth_manager)
-            try:
-                self.get_favourite_playlist()
-            except SpotifyOauthError:
-                print("Wrong SpotifyAPI credentials provided!")
+        auth_manager = SpotifyOAuth(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            redirect_uri=self.redirect_uri,
+            scope="user-library-read user-library-modify"
+        )
+        self.user = spotipy.Spotify(auth_manager=auth_manager)
+        try:
+            self.get_favourite_playlist()
+        except SpotifyOauthError:
+            print("\nWrong SpotifyAPI credentials provided!")
 
     def get_songs_sublist(self, offset=0, limit=50):
         return self.user.current_user_saved_tracks(limit=limit, offset=offset)
@@ -67,14 +43,6 @@ class SpotifyClient:
                 for item in results['items']:
                     playlist.append(SpotifySong(item['track']))
         self.favourite_playlist = playlist
-
-    def print_favourite_playlist(self):
-        if self.get_favourite_playlist:
-            count = len(self.favourite_playlist)
-            for idx, song in enumerate(self.favourite_playlist, start=1):
-                print(f"({idx}/{count}) {song}")
-        else:
-            print(f"No songs in Spotify favourite playlist!")
 
     @staticmethod
     def get_song_age_in_days(song):
@@ -102,7 +70,7 @@ class SpotifyClient:
             for song in self.favourite_playlist:
                 backup_file.write(f'{song.url}\n')
 
-    def restore_favourite_playlist_from_backup(self, time_out=0):
+    def restore_favourite_playlist_from_backup(self, time_out=0.0):
         backup_urls = []
         with open('Backups/favourite_backup.txt', 'r') as backup_file:
             for line in backup_file:
@@ -115,32 +83,34 @@ class SpotifyClient:
                         self.user.current_user_saved_tracks_add([backup_url])
                         time.sleep(time_out)
             except spotipy.SpotifyException:
-                print("SpotifyAPI error occured - restarting process")
+                print("SpotifyAPI error occurred - restarting process")
                 self.restore_favourite_playlist_from_backup(time_out+0.2)
         os.remove("Backups/favourite_backup.txt")
 
-    def sort_favourite_playlist(self, sort_method, reverse=False, time_out=0):
+    def sort_favourite_playlist(self, sort_method, reverse=False, time_out=0.0):
         unsorted_playlist_names = [str(song) for song in self.favourite_playlist]
         if os.path.isfile('Backups/favourite_backup.txt'):
-            print('Restoring favourite playlist from backup file')
+            print('\nRestoring favourite playlist from backup file...')
             self.restore_favourite_playlist_from_backup()
             self.get_favourite_playlist()
         sorted_playlist = self.get_sorted_playlist(self.favourite_playlist, sort_method, not reverse)
         sorted_playlist_names = [str(song) for song in reversed(sorted_playlist)]
         list_count = len(self.favourite_playlist)
         if sorted_playlist_names != unsorted_playlist_names:
+            print('\nCreating backup file...')
             self.create_favourite_playlist_backup_file()
+            print('Sorting started...')
             try:
                 for idx, disordered_song in enumerate(self.favourite_playlist, start=1):
                     print(f'({idx}/{2*list_count}) DELETE => {disordered_song}')
                     self.user.current_user_saved_tracks_delete([disordered_song.url])
                     time.sleep(time_out)
             except spotipy.SpotifyException:
-                print("SpotifyAPI error occured - restarting process")
+                print("SpotifyAPI error occurred - restarting process")
                 self.sort_favourite_playlist(sort_method, reverse, time_out + 0.2)
             for idx, song_in_order in enumerate(sorted_playlist, start=1):
                 print(f'({idx+list_count}/{2 * list_count}) ADD => {song_in_order}')
                 self.user.current_user_saved_tracks_add([song_in_order.url])
                 time.sleep(1)
         else:
-            print("Favourite playlist already sorted with selected method.")
+            print("\nFavourite playlist already sorted with selected method.")
