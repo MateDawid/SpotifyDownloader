@@ -18,7 +18,7 @@ To run SpotifyDownloader you will need to:
 * clone this repository to your computer or unpack .zip file in chosen directory
 * install demanded packages with **pip install -r requirements.txt**
 * install FFmpeg in accordance with [spotDL documentation](https://github.com/spotDL/spotify-downloader#installation)
-* type **"python [PATH\TO\APP]\main.py"**
+* type **"python [PATH\TO\APP]\SpotifyDownloader\main.py"**
 
 ## Features
 * Displaying list of not liked songs from set download directory
